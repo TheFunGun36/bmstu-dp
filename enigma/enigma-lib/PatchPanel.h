@@ -1,7 +1,8 @@
 #pragma once
+#include "Reflector.h"
 
-// Коммутационная панель
-class PatchPanel {
+class PatchPanel : public Reflector {
 public:
-
+    PatchPanel(const Alphabet& encoding);
+    PatchPanel(Alphabet&& encoding) noexcept;
 };

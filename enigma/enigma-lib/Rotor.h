@@ -6,8 +6,10 @@
 class Rotor : public Permutator {
 public:
     Rotor(const Alphabet& encoding);
+    Rotor(Alphabet&& encoding);
+    Rotor(Rotor&& other) noexcept;
 
-    void rotate(int shift);
+    bool rotate();
     int rotation();
     void set_rotation(int value);
 

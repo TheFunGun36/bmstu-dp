@@ -1,9 +1,16 @@
 #include "Permutator.h"
 #include <cassert>
 
-Permutator::Permutator(const Alphabet& encoding)
-    : m_encoding(encoding) {
-    assert(m_encoding.size() == g_alphabet_length);
+Permutator::Permutator(const Alphabet& encoding) {
+    set_encoding(encoding);
+}
+
+Permutator::Permutator(Alphabet&& encoding) {
+    set_encoding(move(encoding));
+}
+
+Permutator::Permutator(Permutator&& other) noexcept
+    : m_encoding(move(other.m_encoding)){
 }
 
 Char Permutator::encode(Char symbol) {
@@ -26,29 +33,14 @@ Char Permutator::decode(Char symbol) {
     return permute_to_letter(letter_index, true);
 }
 
-int Permutator::normalize_letter(Char& symbol) {
-    int letter_index = -1;
-    if (is_letter_maincase(symbol)) {
-        letter_index = symbol - g_alphabet_begin;
-    }
-    else if (is_letter_othercase(symbol)) {
-        letter_index = symbol - g_alphabet_othercase_begin;
-        symbol += g_alphabet_begin - g_alphabet_othercase_begin;
-    }
-
-    return letter_index;
+void Permutator::set_encoding(const Alphabet& encoding) {
+    Alphabet encoding_copied = encoding;
+    set_encoding(move(encoding_copied));
 }
 
-bool Permutator::is_letter_maincase(Char symbol) {
-    unsigned char s = symbol;
-    return s >= g_alphabet_begin
-        && s < g_alphabet_begin + g_alphabet_length;
-}
-
-bool Permutator::is_letter_othercase(Char symbol) {
-    unsigned char s = symbol;
-    return s >= g_alphabet_othercase_begin
-        && s < g_alphabet_othercase_begin + g_alphabet_length;
+void Permutator::set_encoding(Alphabet&& encoding) {
+    assert(encoding.size() == g_alphabet_length);
+    m_encoding = move(encoding);
 }
 
 Char Permutator::permute_to_letter(int letter_index, bool inverse) {
@@ -64,12 +56,4 @@ Char Permutator::permute_to_letter(int letter_index, bool inverse) {
 
     assert(pos != m_encoding.end());
     return g_alphabet_begin + (pos - m_encoding.begin());
-}
-
-int Permutator::normalize_letter_index(int letter_index) {
-    if (letter_index < 0)
-        letter_index += ((-letter_index - 1) / 3 + 1) * g_alphabet_length;
-    else if (letter_index >= g_alphabet_length)
-        letter_index -= letter_index / g_alphabet_length * g_alphabet_length;
-    return letter_index;
 }

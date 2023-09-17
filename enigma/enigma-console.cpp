@@ -1,7 +1,7 @@
 #include <iostream>
 #include <algorithm>
 #include <random>
-#include "enigma-lib/Rotor.h"
+#include "enigma-lib/Enigma.h"
 
 static void shuffle_alphabet(Alphabet& alphabet) {
     std::random_device rd;
@@ -17,6 +17,7 @@ int main() {
     system("chcp 1251 > nul");
     Alphabet plain_alphabet =
         "юабцдефгхийклмнопярстужвьызшэщчъ";
+    Alphabet halved_alphabet = "пярстужвьызшэщчъ";
 
     
     Alphabet rotor1_encoding =
@@ -25,25 +26,28 @@ int main() {
         "тжбдусозцящкрихйъючвашфьыеэпмлгн";
     Alphabet rotor3_encoding =
         "кйоемъаэнвбждзюушыцяьпиртслгчщхф";
+    Alphabet reflector_encoding =
+        "прсзвэтщжучышяьъ";
+    Alphabet panel_encoding =
+        "ятщзъчывьэрсжушп";
 
-    Rotor rotor(plain_alphabet);
+    Enigma enigma(3);
+    enigma.bypass_non_alphabetical = true;
+    enigma.set_reflector_encoding(reflector_encoding);
+    enigma.set_patch_panel_encoding(panel_encoding);
+    enigma.set_rotor_encoding(rotor1_encoding, 0);
+    enigma.set_rotor_encoding(rotor2_encoding, 1);
+    enigma.set_rotor_encoding(rotor3_encoding, 2);
 
-    for (int i = 0; i < g_alphabet_length + 1; i++) {
-        Char encoded = rotor.encode('Ю');
-        std::cout << "a->" << rotor.encode('Ю')
-            << ", inverse: "
-            << encoded << "->"
-            << rotor.decode(encoded)
-            << '\n';
-        rotor.rotate(1);
-    }
-    
-
-    //Alphabet panel_encoding =
-    //    "ыздачкрэшуъжняхлвоьгитцщпфмюбесй";
-    //
-    //shuffle_alphabet(plain_alphabet);
-    //std::cout << plain_alphabet;
+    using namespace std;
+    string message = "оПХБЕР ЛХП!";
+    cout << message << "\n";
+    enigma.set_rotor_code({ 31, 31, 29 });
+    enigma.encode_string(message);
+    cout << message << "\n";
+    enigma.set_rotor_code({ 31, 31, 29 });
+    enigma.encode_string(message);
+    cout << message << "\n";
 
     return 0;
 }
