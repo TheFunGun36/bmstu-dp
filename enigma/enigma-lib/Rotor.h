@@ -1,25 +1,19 @@
 #pragma once
-#include <string>
+#include "Permutator.h"
 #include "Alphabet.h"
 
 // Ротор. Биекция алфавита на самого себя.
-class Rotor {
+class Rotor : public Permutator {
 public:
-    using Alphabet = std::string;
+    Rotor(const Alphabet& encoding);
 
-    Rotor(const Alphabet& alphabet_encoding);
-
-    Char encode(Char symbol);
-    Char decode(Char symbol);
     void rotate(int shift);
+    int rotation();
+    void set_rotation(int value);
 
 private:
-    static bool is_letter_maincase(Char symbol);
-    static bool is_letter_othercase(Char symbol);
-    static int normalize_letter_index(int letter_index);
     int cyclic_shift(int letter_index, bool inverse = false);
-    Char shifted_letter(int letter_index, bool inverse = false);
+    virtual Char permute_to_letter(int letter_index, bool inverse = false) override;
 
-    Alphabet m_alphabet_encoding;
-    int m_current_rotation;
+    int m_rotation;
 };

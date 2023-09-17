@@ -3,7 +3,7 @@
 #include <random>
 #include "enigma-lib/Rotor.h"
 
-static void shuffle_alphabet(Rotor::Alphabet& alphabet) {
+static void shuffle_alphabet(Alphabet& alphabet) {
     std::random_device rd;
     std::mt19937 g(rd());
     std::shuffle(alphabet.begin(), alphabet.end(), g);
@@ -15,21 +15,35 @@ int main() {
         "good luck on making port though XDXDXD");
 #endif
     system("chcp 1251 > nul");
-    Rotor::Alphabet plain_alphabet =
+    Alphabet plain_alphabet =
         "юабцдефгхийклмнопярстужвьызшэщчъ";
 
-    Rotor::Alphabet shuffled1 =
+    
+    Alphabet rotor1_encoding =
         "сзтьнюврмбокгжлцуйщапеъдяфчшэыих";
-    Rotor::Alphabet shuffled2 =
+    Alphabet rotor2_encoding =
         "тжбдусозцящкрихйъючвашфьыеэпмлгн";
-    Rotor::Alphabet shuffled3 =
+    Alphabet rotor3_encoding =
         "кйоемъаэнвбждзюушыцяьпиртслгчщхф";
 
     Rotor rotor(plain_alphabet);
 
     for (int i = 0; i < g_alphabet_length + 1; i++) {
-        std::cout << rotor.encode('Ю') << ' ' << rotor.encode('ю') << '\n';
+        Char encoded = rotor.encode('Ю');
+        std::cout << "a->" << rotor.encode('Ю')
+            << ", inverse: "
+            << encoded << "->"
+            << rotor.decode(encoded)
+            << '\n';
         rotor.rotate(1);
     }
+    
+
+    //Alphabet panel_encoding =
+    //    "ыздачкрэшуъжняхлвоьгитцщпфмюбесй";
+    //
+    //shuffle_alphabet(plain_alphabet);
+    //std::cout << plain_alphabet;
+
     return 0;
 }

@@ -2,5 +2,6 @@
 
 // Коммутационная панель
 class PatchPanel {
+public:
 
 };
