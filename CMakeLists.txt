@@ -6,7 +6,7 @@ set(Boost_USE_STATIC_RUNTIME OFF)
 
 
 project(bmstu-data-protection
-	VERSION 0.1
+	VERSION 0.2
 	DESCRIPTION "BMSTU, data protection lab collection"
 	LANGUAGES CXX)
 
