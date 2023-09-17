@@ -1,6 +1,7 @@
 #pragma once
 #include <vector>
 #include <ostream>
+#include <istream>
 #include "SmartPointers.h"
 #include "Rotor.h"
 #include "Reflector.h"
@@ -12,6 +13,7 @@ public:
 
     Char encode_char(Char letter, std::ostream* verbose = nullptr);
     void encode_string(std::string& letter, std::ostream* verbose = nullptr);
+    void encode_stream(std::istream& input, std::ostream& output, std::ostream* verbose = nullptr);
 
     std::vector<int> rotor_code();
     void set_rotor_code(const std::vector<int>& rotor_code);

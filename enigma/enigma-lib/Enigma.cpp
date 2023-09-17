@@ -26,6 +26,12 @@ void Enigma::encode_string(std::string& str, std::ostream* verbose) {
         el = process_char(el, verbose);
 }
 
+void Enigma::encode_stream(std::istream& input, std::ostream& output, std::ostream* verbose) {
+    Char c;
+    while (input.get(c))
+        output << process_char(c, verbose);
+}
+
 std::vector<int> Enigma::rotor_code() {
     std::vector<int> result(m_rotors.size());
     for (int i = 0; i < m_rotors.size(); i++)
