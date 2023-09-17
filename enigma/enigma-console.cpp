@@ -1,6 +1,7 @@
 #include <iostream>
 #include <algorithm>
 #include <random>
+#include <fstream>
 #include "enigma-lib/Enigma.h"
 
 static void shuffle_alphabet(Alphabet& alphabet) {
@@ -15,11 +16,12 @@ int main() {
         "good luck on making port though XDXDXD");
 #endif
     system("chcp 1251 > nul");
+
     Alphabet plain_alphabet =
         "юабцдефгхийклмнопярстужвьызшэщчъ";
-    Alphabet halved_alphabet = "пярстужвьызшэщчъ";
+    Alphabet halved_alphabet =
+        "пярстужвьызшэщчъ";
 
-    
     Alphabet rotor1_encoding =
         "сзтьнюврмбокгжлцуйщапеъдяфчшэыих";
     Alphabet rotor2_encoding =
@@ -39,15 +41,9 @@ int main() {
     enigma.set_rotor_encoding(rotor2_encoding, 1);
     enigma.set_rotor_encoding(rotor3_encoding, 2);
 
-    using namespace std;
-    string message = "оПХБЕР ЛХП!";
-    cout << message << "\n";
-    enigma.set_rotor_code({ 31, 31, 29 });
-    enigma.encode_string(message);
-    cout << message << "\n";
-    enigma.set_rotor_code({ 31, 31, 29 });
-    enigma.encode_string(message);
-    cout << message << "\n";
+    std::ifstream in("input.txt");
+    std::ofstream out("output.txt");
+    enigma.encode_stream(in, out, &std::cout);
 
     return 0;
 }

@@ -70,42 +70,39 @@ Char Enigma::process_char(Char letter, std::ostream* verbose) {
     }
 
     // На вводе коммутационная панель
-    if (verbose) *verbose << letter << " > p > ";
+    if (verbose) *verbose << letter << " >|К|> ";
     letter = m_patch_panel->encode(letter);
     if (verbose) *verbose << letter;
 
     // По очереди роторы, с первого по последний
     for (int i = 0; i < m_rotors.size(); i++) {
-        if (verbose) *verbose << " > r" << i + 1 << " > ";
+        if (verbose) *verbose << " >|Р|> ";
         letter = m_rotors[i]->encode(letter);
         if (verbose) *verbose << letter;
     }
 
     // Рефлектор
     if (verbose) {
-        std::string spacer(20 + 5 * m_rotors.size(), ' ');
-        *verbose << '\n';
-        *verbose << spacer;
-        *verbose << "v\n";
-        *verbose << spacer;
-        *verbose << "m\n";
-        *verbose << spacer;
-        *verbose << "v\n";
+        *verbose << " >|\n";
+        *verbose << "   |О|     ";
+        for (int i = 0; i < m_rotors.size(); i++)
+            *verbose << "|Т|     ";
+        *verbose << "|РЕФЛЕКТОР\n";
     }
     std::stringstream buf;
     letter = m_reflector->encode(letter);
-    if (verbose) buf << '\n' << letter << " < ";
+    if (verbose) buf << "\n\n\n|< " << letter << " <";
 
 
     // Роторы, в обратном порядке
     for (int i = m_rotors.size() - 1; i >= 0; i--) {
-        if (verbose) buf << i + 1 << "r < ";
+        if (verbose) buf << "|" << i + 1 << "|< ";
         letter = m_rotors[i]->decode(letter);
-        if (verbose) buf << letter << " < ";
+        if (verbose) buf << letter << " <";
     }
 
     // На выводе коммутационная панель
-    if (verbose) buf << "p < ";
+    if (verbose) buf << "|М|< ";
     letter = m_patch_panel->decode(letter);
     if (verbose) {
         buf << letter;
