@@ -1,0 +1,145 @@
+\usepackage{extsizes}
+
+\usepackage[T1, T2A]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage[english,russian]{babel}
+\usepackage{tempora}
+
+\usepackage[left=30mm,right=10mm,top=20mm,bottom=20mm]{geometry}
+
+\usepackage{setspace}
+\onehalfspacing
+
+\usepackage{indentfirst}
+\setlength{\parindent}{1.25cm}
+
+\usepackage{enumitem}
+\setlist{nolistsep}
+
+\renewcommand{\labelitemi}{---}
+\renewcommand{\labelenumi}{\arabic{enumi})}
+
+\usepackage{graphicx}
+\graphicspath{ {./img/} }
+
+\usepackage{listings}
+\lstset{
+	basicstyle=\footnotesize\ttfamily,
+	numbers=left,
+	numberstyle=\tiny,
+	numbersep=5pt,
+	tabsize=4,
+	breaklines=true,
+	frame=b,
+	stringstyle=\ttfamily\ttfamily,
+	showspaces=false,
+	showtabs=false,
+	xleftmargin=17pt,
+	framexleftmargin=17pt,
+	framexrightmargin=5pt,
+	framexbottommargin=4pt,
+	showstringspaces=false,
+	inputencoding=utf8x,
+	keepspaces=true,
+	numberbychapter=false
+}
+
+\usepackage{amsmath}
+\usepackage{amsfonts}
+\usepackage{mathtools}
+
+\usepackage{tikz}
+\usepackage{pgfplots}
+
+\usepackage[normalem]{ulem}
+
+\usepackage{titlesec}
+
+\titleformat{\chapter}[block]{\bfseries\normalsize\filcenter}{\thechapter}{1em}{}[
+	]
+\titlespacing\chapter{\parindent}{-2em}{1em}
+
+\titleformat{\section}[hang]{\bfseries\normalsize}{\thesection}{1em}{}
+\titlespacing\section{\parindent}{\parskip}{\parskip}
+
+\titleformat{\subsection}[hang]{\bfseries\normalsize}{\thesubsection}{1em}{}
+\titlespacing\subsection{\parindent}{\parskip}{\parskip}
+
+\usepackage{slashbox}
+
+\usepackage{caption}
+\captionsetup[figure]{justification=centering}
+\DeclareCaptionLabelSeparator{emdash}{\ ---\ }
+\captionsetup[figure]{name={Рисунок},labelsep=emdash}
+\captionsetup[lstlisting]{justification=raggedright, labelsep=emdash}
+\captionsetup[table]{singlelinecheck=false, labelsep=emdash}
+
+\counterwithout{figure}{chapter}
+\counterwithout{table}{chapter}
+\counterwithout{equation}{chapter}
+
+\newenvironment{sequations} {
+\begin{subequations}
+\renewcommand{\theequation}{\arabic{parentequation}.\arabic{equation}}
+}{
+\end{subequations}
+}
+
+\usepackage{array}
+\newenvironment{signstabular}[1][1]{
+	\renewcommand*{\arraystretch}{#1}
+	\tabular
+}{
+	\endtabular
+}
+
+\makeatletter
+\g@addto@macro\@floatboxreset\centering
+\makeatother
+
+\makeatletter
+\renewcommand\@biblabel[1]{#1.}
+\makeatother
+
+\usepackage{rotating}
+
+\addto\captionsrussian{\renewcommand{\bibname}{Список использованных источников}}
+
+\usepackage{diagbox}
+
+\usepgfplotslibrary{external} 
+\tikzexternalize
+
+\usepackage{longtable}
+\usepackage{pdfpages}
+\usepackage{etoolbox}
+
+\newcounter{totfigures}
+\newcounter{tottables}
+\newcounter{totpages}
+\newcounter{totsources}
+
+\providecommand\totfig{} 
+\providecommand\tottab{} 
+\providecommand\totpg{}
+\providecommand\totsrc{}
+
+\makeatletter
+\AtEndDocument{
+	\addtocounter{totfigures}{\value{figure}}
+	\addtocounter{tottables}{\value{table}}
+	\addtocounter{totpages}{\value{page}}
+	\addtocounter{totsources}{\value{enumiv}}
+	\immediate\write\@mainaux{
+	  \string\gdef\string\totfig{\number\value{totfigures}}
+	  \string\gdef\string\tottab{\number\value{tottables}}
+	  \string\gdef\string\totpg{\number\value{totpages}}
+	  \string\gdef\string\totsrc{\number\value{totsources}}
+	}
+}
+\makeatother
+
+\addto\captionsrussian{% Replace "english" with the language you use
+  \renewcommand{\contentsname}%
+    {Содержание}%
+}

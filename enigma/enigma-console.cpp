@@ -10,8 +10,8 @@ constexpr const char* output_file_name = "output";
 constexpr const char* doubled_output_file_name = "output2";
 
 //#define USE_RUS
-//#define USE_ENG
-#define USE_BIN
+#define USE_ENG
+//#define USE_BIN
 
 static void shuffle_alphabet(std::string& alphabet) {
     //static std::random_device rd;
@@ -33,6 +33,8 @@ int main(int argc, const char* argv[]) {
     system("chcp 1251 > nul");
     const char* input_file_name =
         (argc == 2) ? argv[1] : "input";
+
+    std::ostream *debug_out = &std::cout;
 
 #ifdef USE_RUS
     std::string alphabet = "ÀÁÂÃÄÅÆÇÈÉÊËÌÍÎÏĞÑÒÓÔÕÖ×ØÙÚÛÜİŞß";
@@ -57,6 +59,7 @@ int main(int argc, const char* argv[]) {
 #endif
 
 #ifdef USE_BIN
+    debug_out = nullptr;
     std::string alphabet(256, '*');
     for (int i = 0; i < 256; i++)
         alphabet[i] = i;
@@ -94,8 +97,8 @@ int main(int argc, const char* argv[]) {
     enigma.set_rotor_encoding(move(rotor3_encoding), 2);
 
     enigma.set_reflector_encoding_bypass(false);
-    enigma.set_patch_panel_encoding_bypass(true);
-    enigma.set_rotor_encoding_bypass(true);
+    enigma.set_patch_panel_encoding_bypass(false);
+    enigma.set_rotor_encoding_bypass(false);
 
     {
         std::ifstream in(input_file_name, std::ios::binary);
@@ -104,13 +107,13 @@ int main(int argc, const char* argv[]) {
 
         std::ofstream out(output_file_name, std::ios::binary);
         enigma.set_rotor_code(rotor_code);
-        enigma.encode_stream(in, out);
+        enigma.encode_stream(in, out, debug_out);
     }
     {
         std::ifstream in(output_file_name, std::ios::binary);
         std::ofstream out(doubled_output_file_name, std::ios::binary);
         enigma.set_rotor_code(rotor_code);
-        enigma.encode_stream(in, out);
+        enigma.encode_stream(in, out, debug_out);
     }
 
     create_binary("bin");
