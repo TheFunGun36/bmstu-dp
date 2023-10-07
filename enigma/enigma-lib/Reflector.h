@@ -2,11 +2,15 @@
 #include "Permutator.h"
 
 // Коммутационная панель
-class Reflector : public Permutator {
+class Reflector {
 public:
-    Reflector(const Alphabet& encoding);
-    Reflector(Alphabet&& encoding) noexcept;
-    Char decode(Char symbol) override;
-    void set_encoding(Alphabet&& encoding) override;
-    void set_encoding(const Alphabet& encoding) override;
+    Reflector(const Permutator& permutator);
+    Reflector(Permutator&& permutator) noexcept;
+    Char put_through(Char symbol) const;
+
+    void set_permutator(Permutator&& permutator);
+    void set_encoding(Permutator::Alphabet&& encoding);
+
+private:
+    Permutator m_permutator;
 };

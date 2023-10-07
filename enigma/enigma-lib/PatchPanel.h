@@ -3,6 +3,6 @@
 
 class PatchPanel : public Reflector {
 public:
-    PatchPanel(const Alphabet& encoding);
-    PatchPanel(Alphabet&& encoding) noexcept;
+    PatchPanel(const Permutator& permutator);
+    PatchPanel(Permutator&& permutator) noexcept;
 };
