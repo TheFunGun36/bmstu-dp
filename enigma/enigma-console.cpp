@@ -16,13 +16,10 @@ int main(int argc, const char *argv[])
 	const char *input_file_name = (argc > 1) ? argv[1] : default_input_file_name;
 	const char *output_file_name = (argc > 2) ? argv[2] : default_output_file_name;
 
-	std::ostream *debug_out = &std::cout;
-
-	//auto enigma = EnigmaFactory::create_enigma_rus();
+	// auto enigma = EnigmaFactory::create_enigma_rus();
 	// auto enigma = EnigmaFactory::create_enigma_eng();
 
 	auto enigma = EnigmaFactory::create_enigma_bin();
-	debug_out = nullptr;
 
 	enigma.set_rotor_code(rotor_code);
 
@@ -31,7 +28,7 @@ int main(int argc, const char *argv[])
 		std::cout << "no such file: \"" << input_file_name << '"';
 
 	std::ofstream out(output_file_name, std::ios::binary);
-	enigma.encode_stream(in, out, debug_out);
+	enigma.encode_stream(in, out, nullptr);
 
 	return 0;
 }
