@@ -99,7 +99,7 @@ Char Permutator::permute_to_letter(int letter_index, bool inverse) const {
     auto pos = std::find(
         m_encoding.begin(),
         m_encoding.end(),
-        letter_index + m_codepage_encoding_begin);
+        Char(letter_index) + m_codepage_encoding_begin);
 
     assert(pos != m_encoding.end());
     return m_codepage_encoding_begin + (pos - m_encoding.begin());
