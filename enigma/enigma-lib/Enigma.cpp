@@ -1,4 +1,5 @@
 #include "Enigma.h"
+#include "Enigma.h"
 #include <cassert>
 #include <sstream>
 
@@ -14,6 +15,19 @@ Enigma::Enigma(Permutator&& permutator, size_t rotors_amount)
     m_rotor_encoding_bypass = false;
     m_reflector_encoding_bypass = false;
     m_patch_panel_encoding_bypass = false;
+}
+
+Enigma::Enigma(Enigma &&moved) noexcept :
+    rotate_on_non_alphabetical(moved.rotate_on_non_alphabetical),
+    bypass_non_alphabetical(moved.bypass_non_alphabetical),
+    m_rotors(move(moved.m_rotors)),
+    m_reflector(move(moved.m_reflector)),
+    m_patch_panel(move(moved.m_patch_panel)),
+    m_permutator(move(moved.m_permutator)),
+    m_rotor_encoding_bypass(moved.m_rotor_encoding_bypass),
+    m_reflector_encoding_bypass(moved.m_reflector_encoding_bypass),
+    m_patch_panel_encoding_bypass(moved.m_patch_panel_encoding_bypass)
+{
 }
 
 Char Enigma::encode_char(Char c, std::ostream* verbose) {
