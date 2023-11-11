@@ -5,7 +5,7 @@
 #include "enigma-lib/EnigmaFactory.h"
 
 
-constexpr std::initializer_list<int> rotor_code = { 1, 1, 1 };
+constexpr std::initializer_list<int> rotor_code = { 1, 2, 3 };
 constexpr const char *default_input_file_name = "input";
 constexpr const char *default_output_file_name = "output";
 
@@ -25,7 +25,7 @@ int main(int argc, const char *argv[])
 
 	std::ifstream in(input_file_name, std::ios::binary);
 	if (!in.is_open())
-		std::cout << "no such file: \"" << input_file_name << '"';
+		std::cout << "file: " << input_file_name << " not found!";
 
 	std::ofstream out(output_file_name, std::ios::binary);
 	enigma.encode_stream(in, out, nullptr);

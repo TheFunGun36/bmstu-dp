@@ -59,7 +59,6 @@ Enigma EnigmaFactory::create_enigma_eng()
 
 static void shuffle_alphabet(std::string &alphabet)
 {
-    //static std::random_device rd;
     static std::mt19937 g(27834);
     std::shuffle(alphabet.begin(), alphabet.end(), g);
 }
