@@ -4,11 +4,9 @@
 #include "enigma-lib/Enigma.h"
 #include "enigma-lib/EnigmaFactory.h"
 
-
 constexpr std::initializer_list<int> rotor_code = { 1, 2, 3 };
 constexpr const char *default_input_file_name = "input";
 constexpr const char *default_output_file_name = "output";
-
 
 int main(int argc, const char *argv[])
 {
