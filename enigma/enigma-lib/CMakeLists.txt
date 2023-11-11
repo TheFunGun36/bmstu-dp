@@ -4,4 +4,4 @@ add_library(enigma-lib STATIC
 	"Rotor.h" "Rotor.cpp"
 	"SmartPointers.h"
 	"Permutator.h" "Permutator.cpp"
-	"PatchPanel.h" "PatchPanel.cpp")
+	"PatchPanel.h" "PatchPanel.cpp" "EnigmaFactory.cpp")

@@ -49,22 +49,3 @@ void Rotor::set_permutator(Permutator&& permutator) {
 void Rotor::set_encoding(Permutator::Alphabet&& encoding) {
     m_permutator.set_encoding(move(encoding));
 }
-
-//Char Rotor::permute_to_letter(int letter_index, bool inverse) {
-//    assert(letter_index >= 0 && letter_index < g_alphabet_length);
-//    if (!inverse) {
-//        letter_index = cyclic_shift(letter_index, inverse);
-//        return m_encoding[letter_index];
-//    }
-//
-//    auto pos = std::find(
-//        m_encoding.begin(),
-//        m_encoding.end(),
-//        letter_index + g_alphabet_begin);
-//
-//    assert(pos != m_encoding.end());
-//
-//    letter_index = pos - m_encoding.begin();
-//    letter_index = cyclic_shift(letter_index, inverse);
-//    return g_alphabet_begin + letter_index;
-//}

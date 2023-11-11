@@ -11,6 +11,7 @@
 class Enigma {
 public:
     Enigma(Permutator&& permutator, size_t rotors_amount);
+    Enigma(Enigma&& moved) noexcept;
 
     Char encode_char(Char letter, std::ostream* verbose = nullptr);
     void encode_string(std::string& letter, std::ostream* verbose = nullptr);
