@@ -1,0 +1,68 @@
+\documentclass[14pt, oneside, a4paper]{extreport}
+\include{../common/preambule.tex}
+
+\begin{document}
+
+\include{titlepage}
+\setcounter{page}{2}
+
+\section*{Введение}
+
+\textbf{Цель} лабораторной работы --- разработать программу шифрования, использующую алоритм «AES».
+
+\textbf{Задачи} лабораторной работы:
+\begin{enumerate}
+	\item изучить алгоритм шифрования <<AES>>;
+	\item изучить режим шифрования <<PCBC>>;
+	\item реализовать описанный алгоритм.
+\end{enumerate}
+
+\section*{Алгоритм шифрования AES}
+
+AES (Advanced Encryption Standard) --- симметричный алгоритм блочного шифрования (размер блока 128 бит, ключ 128/192/256 бит), принятый в качестве стандарта шифрования правительством США.
+
+AES состоит из нескольких раундов шифрования:
+\begin{itemize}
+	 \item Деление на блоки: в AES элементы организованы в матрицы 4 на 4 по
+	128 бит. Получается, нас есть сообщение размером 128 бит или 16 байтов
+	в виде матрицы 4 на 4.
+	\item Наложение фрагмента ключа через XOR: Сначала функция SubBytes
+	подставляет на место одних байтов другие из таблицы замены (S-блока).	
+	\item ShiftRows сдвигает элементы в каждом ряду матрицы.	
+	\item MixColumns перемешивает элементы в каждом столбце. 
+	\item В конце каждого раунда добавляется раундовый ключ (Round Key).
+\end{itemize}
+
+\begin{figure}[!ht]
+   \includegraphics[width=0.90\linewidth]{aes}
+   \caption{Ход шифровки/расшифровки блока алгоритмом <<AES>>}
+   \label{fig:aes}
+\end{figure}
+\clearpage
+
+Алгоритм шифрования AES может использоваться в следующих режимах.
+
+\begin{enumerate}
+	\item CBC (Cipher Block Chaining) --- режим сцепления блоков;
+	\item PCBC (Cipher Block Chaining) --- режим распространяющегося сцепления блоков;
+	\item CFB (Cipher Feed Back) --- режим гаммирования с обратной связью;
+	\item OFB (Output Feed Back) --- режим обратной связи по выходу.
+\end{enumerate}
+
+\begin{figure}[!ht]
+   \includegraphics[width=1\linewidth]{pcbc}
+   \caption{Ход шифровки/расшифровки сообщения алгоритмом <<PCBC>>}
+   \label{fig:pcbc}
+\end{figure}
+
+\section*{Заключение}
+
+В ходе работы была разработана программа, осуществляющая шифрование входных данных с помощью алгоритма AES в режиме шифрования PCBC.
+
+%\tableofcontents
+
+%\addcontentsline{toc}{chapter}{Список использованных источников}
+%\bibliographystyle{utf8gost705u}
+%\bibliography{sources}
+
+\end{document}
