@@ -165,19 +165,8 @@ int main(int argc, Char* argv[]) {
     // d45e5a0fe4bfbfd7b1359ce7dd2d63be
     Char* key = generate_byte_array(block_size);
 
-    //encrypt(iv, key);
-    //decrypt(iv, key);
-    using std::ios;
-    std::ifstream in("abc.bmp", ios::binary);
-    std::ofstream out("cba.bmp", ios::binary);
-    Char block[16];
-    Aes aes;
-    aes.set_key(key);
-    while (in.read((char*)block, 16)) {
-        aes.block_encrypt(block);
-        out.write((char*)block, 16);    
-    }
-    
+    encrypt(iv, key);
+    decrypt(iv, key);
 
     return 0;
 }
