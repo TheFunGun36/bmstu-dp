@@ -1,1 +1,1 @@
-add_executable(aes-console "aes.cpp" "aes-console.cpp")
+add_executable(aes-console "aes.cpp" "aes-console.cpp" "pcbc.cpp" "pcbc.h" "encryption_engine.h")

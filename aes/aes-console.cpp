@@ -1,14 +1,14 @@
 #include <random>
 #include <vector>
 #include <fstream>
-#include "gf.h"
 #include "sbox.h"
 #include "aes.h"
+#include "pcbc.h"
 
 constexpr const char* filename_in = "input";
 constexpr const char* filename_out = "output";
 constexpr const char* filename_out2 = "output2";
-#define min(a, b) ((a < b) ? (a) : (b))
+#define min(a, b) (((a) < (b)) ? (a) : (b))
 
 Char* generate_byte_array(size_t size) {
     static std::mt19937 g(27834);
@@ -22,140 +22,106 @@ Char* generate_byte_array(size_t size) {
     return result;
 }
 
-void block_xor(Char* a, const Char* b) {
-    for (int i = 0; i < block_size; i++)
-        a[i] ^= b[i];
-}
-
-void block_copy(Char* dst, const Char* src) {
-    memcpy(dst, src, block_size);
-}
-
-void block_xor_to(Char* dst, const Char* a, const Char* b) {
-    block_copy(dst, a);
-    block_xor(dst, b);
-}
-
-void encrypt(const Char* iv, const Char* key) {
+void copy_first(size_t bytes) {
     using std::ios;
     std::ifstream in(filename_in, ios::binary);
-    in.seekg(0, ios::end);
-    size_t file_size = in.tellg();
-    in.seekg(0);
-
-    std::ofstream out(filename_out, ios::binary);
-
-    // initialization vector
-    Char* prev_block = new Char[block_size];
-    block_copy(prev_block, iv);
-
-    Aes aes;
-    aes.set_key(key);
-
-    // processing data blocks
-    Char* plaintext = new Char[block_size];
-    Char* ciphertext = new Char[block_size];
-
-    // for first iteration, add 8 bytes of size to the beginning of the first block
-    *(size_t*)plaintext = file_size;
-
-    if (file_size <= 8) {
-        in.read((char*)plaintext + sizeof(size_t), file_size);
-
-        block_xor_to(ciphertext, plaintext, prev_block);
-        aes.block_encrypt(ciphertext);
-        out.write((char*)ciphertext, block_size);
-        block_xor_to(prev_block, plaintext, ciphertext);
-    }
-    else {
-        in.read((char*)plaintext + sizeof(size_t), block_size - sizeof(size_t));
-
-        block_xor_to(ciphertext, plaintext, prev_block);
-        aes.block_encrypt(ciphertext);
-        out.write((char*)ciphertext, block_size);
-        block_xor_to(prev_block, plaintext, ciphertext);
-
-        size_t left_to_write = file_size - sizeof(size_t);
-
-        while (left_to_write > block_size) {
-            in.read((char*)plaintext, block_size);
-
-            block_xor_to(ciphertext, plaintext, prev_block);
-            aes.block_encrypt(ciphertext);
-            out.write((char*)ciphertext, block_size);
-            block_xor_to(prev_block, plaintext, ciphertext);
-
-            left_to_write -= block_size;
-        };
-
-        in.read((char*)plaintext, left_to_write);
-
-        block_xor_to(ciphertext, plaintext, prev_block);
-        aes.block_encrypt(ciphertext);
-        out.write((char*)ciphertext, block_size);
-        block_xor_to(prev_block, plaintext, ciphertext);
-    }
-
-    delete[]plaintext;
-    delete[]ciphertext;
-    delete[]prev_block;
+    std::fstream out(filename_out, ios::in | ios::out | ios::binary);
+    char* buff = new char[bytes];
+    in.read(buff, bytes);
+    out.write(buff, bytes);
+    delete[]buff;
 }
 
-void decrypt(const Char* iv, const Char* key) {
+bool encrypt(EncryptionEngine &engine, bool include_file_size = true) {
     using std::ios;
-    std::ifstream in(filename_out, ios::binary);
+    std::ifstream in(filename_in, ios::binary);
+    std::ofstream out(filename_out, ios::binary);
+
+    if (!in.is_open() || !out.is_open())
+        return false;
+
     in.seekg(0, ios::end);
-    size_t blocks_count = in.tellg() / block_size;
+    size_t file_size = in.tellg();
+    size_t left_to_read = file_size;
     in.seekg(0);
-    std::ofstream out(filename_out2, ios::binary);
-
-    // initialization vector
-    Char* prev_block = new Char[block_size];
-    block_copy(prev_block, iv);
-
-    Aes aes;
-    aes.set_key(key);
 
     // processing data blocks
-    Char* ciphertext = new Char[block_size];
-    Char* plaintext = new Char[block_size];
+    Char buffer[block_size];
 
-    // for first iteration, add 8 bytes of size to the beginning of the first block
-
-    in.read((char*)ciphertext, block_size);
-
-    block_copy(plaintext, ciphertext);
-    aes.block_decrypt(plaintext);
-    block_xor(plaintext, prev_block);
-    size_t filesize = *(size_t*)plaintext;
-    out.write((char*)plaintext + sizeof(size_t), min(filesize, block_size - sizeof(size_t)));
-    
-    if (blocks_count > 1) {
-        block_xor_to(prev_block, ciphertext, plaintext);
-
-        for (int i = 1; i < blocks_count - 1; i++) {
-            in.read((char*)ciphertext, block_size);
-
-            block_copy(plaintext, ciphertext);
-            aes.block_decrypt(plaintext);
-            block_xor(plaintext, prev_block);
-            out.write((char*)plaintext, block_size);
-            block_xor_to(prev_block, ciphertext, plaintext);
-        }
-
-        in.read((char*)ciphertext, block_size);
-
-        block_copy(plaintext, ciphertext);
-        aes.block_decrypt(plaintext);
-        block_xor(plaintext, prev_block);
-
-        
-        out.write((char*)plaintext, (filesize + sizeof(size_t)) - block_size * (blocks_count - 1));
+    size_t readed = 0;
+    if (!include_file_size) {
+        readed = min(file_size, block_size);
+    }
+    else {
+        // Using source file size, not the result one
+        *(size_t*)buffer = file_size;
+        readed = min(file_size, block_size - sizeof(size_t));
     }
 
-    delete[]ciphertext;
-    delete[]plaintext;
-    delete[]prev_block;
+    in.read((char*)buffer + sizeof(size_t), readed);
+    left_to_read -= readed;
+
+    engine.encrypt(buffer);
+    out.write((char*)buffer, block_size);
+
+    while (left_to_read > block_size) {
+        in.read((char*)buffer, block_size);
+        engine.encrypt(buffer);
+        out.write((char*)buffer, block_size);
+        left_to_read -= block_size;
+    }
+
+    if (left_to_read > 0) {
+        memset(buffer, 0, block_size);  //safety!
+        in.read((char*)buffer, left_to_read);
+        engine.encrypt(buffer);
+        out.write((char*)buffer, block_size);
+    }
+}
+
+void decrypt(EncryptionEngine &engine, bool include_file_size = true) {
+    using std::ios;
+    std::ifstream in(filename_out, ios::binary);
+    std::ofstream out(filename_out2, ios::binary);
+
+    in.seekg(0, ios::end);
+    size_t file_size = in.tellg();
+    size_t blocks_count = file_size / block_size;
+    size_t blocks_left = blocks_count - 1;
+    in.seekg(0);
+
+    // processing data blocks
+    Char buffer[block_size];
+
+    in.read((char*)buffer, block_size);
+    engine.decrypt(buffer);
+
+    if (include_file_size) {
+        file_size = *(size_t*)buffer;
+        const size_t to_write = min(block_size - sizeof(size_t), file_size);
+        out.write((char*)buffer + sizeof(size_t), to_write);
+    }
+    else {
+        out.write((char*)buffer, block_size);
+    }
+
+    while (blocks_left > 1) {
+        in.read((char*)buffer, block_size);
+        engine.decrypt(buffer);
+        out.write((char*)buffer, block_size);
+        blocks_left--;
+    }
+
+    if (blocks_left > 0) {
+        memset(buffer, 0, block_size);  //safety!
+        in.read((char*)buffer, block_size);
+        engine.decrypt(buffer);
+
+        size_t left_to_read = block_size;
+        if (include_file_size)
+            left_to_read = file_size + sizeof(size_t) - (blocks_count - 1) * block_size;
+        out.write((char*)buffer, left_to_read);
+    }
 }
 
 int main(int argc, Char* argv[]) {
@@ -165,8 +131,13 @@ int main(int argc, Char* argv[]) {
     // d45e5a0fe4bfbfd7b1359ce7dd2d63be
     Char* key = generate_byte_array(block_size);
 
-    encrypt(iv, key);
-    decrypt(iv, key);
+    //Aes engine(key);
+    Pcbc engine(key, iv);
+    encrypt(engine);
+    engine.reset();
+    decrypt(engine);
+
+    //copy_first(0x35);
 
     return 0;
 }

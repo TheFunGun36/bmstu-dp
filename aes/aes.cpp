@@ -2,7 +2,12 @@
 #include "sbox.h"
 #include <memory>
 
-void Aes::block_encrypt(Char* block) {
+Aes::Aes(const Char* key) {
+    memcpy(m_key, key, block_size);
+    expand_key();
+}
+
+void Aes::encrypt(Char* block) {
     add_round_key(block, 0);
 
     for (int i = 1; i < rounds; i++) {
@@ -17,7 +22,7 @@ void Aes::block_encrypt(Char* block) {
     add_round_key(block, rounds);
 }
 
-void Aes::block_decrypt(Char* block) {
+void Aes::decrypt(Char* block) {
     add_round_key(block, rounds);
 
     for (int i = rounds - 1; i > 0; i--) {
@@ -32,19 +37,12 @@ void Aes::block_decrypt(Char* block) {
     add_round_key(block, 0);
 }
 
-void Aes::set_key(const Char* key) {
-    memcpy(m_key, key, block_size);
-    m_block_index = 1;
-    m_rc = 1;
-    expand_key();
-}
-
 void Aes::sub_bytes(Char* block, bool inv) {
     for (int i = 0; i < block_size; i++)
         block[i] = inv ? inv_sbox[block[i]] : sbox[block[i]];
 }
 
-void Aes::shift(Char* arr, size_t size, size_t times) {
+static void shift(Char* arr, size_t size, size_t times) {
     for (int t = 0; t < times; t++) {
         Char buf = arr[0];
         for (int i = 1; i < size; i++)
@@ -124,38 +122,6 @@ void Aes::mix_columns(Char* block, bool inv) {
     }
 }
 
-void Aes::next_key_exp(Char* block) {
-    Char new_key[block_size];
-
-    for (int col = 0; col < 4; col++) {
-        if (col % 4 == 0) {
-            // циклический сдвиг предыдущего слова
-            for (int i = 0; i < 4; i++)
-                new_key[i * 4] = m_key[3 + ((i + 1) % 4) * 4];
-
-            // SBox его
-            for (int i = 0; i < 4; i++)
-                new_key[i * 4] = sbox[new_key[i * 4]];
-
-            // xor с первым столбцом предыдущего ключа
-            for (int i = 0; i < 4; i++)
-                new_key[i * 4] ^= m_key[i * 4];
-
-            // xor с rcon
-            new_key[0] ^= m_rc;
-        }
-        else {
-
-            for (int i = 0; i < 4; i++)
-                new_key[col + i * 4] = m_key[col + i * 4] ^ new_key[col - 1 + i * 4];
-        }
-    }
-
-    memcpy(m_key, new_key, block_size);
-    m_block_index++;
-    m_rc = next_rc();
-}
-
 void Aes::add_round_key(Char* block, size_t key_index) {
     Char *base = m_key + key_index * block_size;
     for (int i = 0; i < block_size; i++)
@@ -164,6 +130,7 @@ void Aes::add_round_key(Char* block, size_t key_index) {
 
 void Aes::expand_key() {
     for (int round = 1; round < rounds; round++) {
+        Char rc = 1;
         for (int col = 0; col < 4; col++) {
             const int blk = round * block_size;
 
@@ -184,7 +151,7 @@ void Aes::expand_key() {
                     m_key[cur + i * 4] ^= m_key[pprev + i * 4];
 
                 // xor с rcon
-                m_key[cur] ^= m_rc;
+                m_key[cur] ^= rc;
             }
             else {
                 const int cur = round * block_size + col;
@@ -194,12 +161,17 @@ void Aes::expand_key() {
                     m_key[cur + i * 4] = m_key[pprev + i * 4] ^ m_key[prev + i * 4];
             }
         }
+
+        rc = next_rc(rc);
     }
 }
 
-Char Aes::next_rc() {
-    Char result = m_rc << 1;
-    if (m_rc >= 0x80)
-        result ^= 0x11b;
-    return result;
+void Aes::reset() {
+}
+
+Char Aes::next_rc(Char rc) {
+    rc <<= 1;
+    if (rc >= 0x80)
+        rc ^= 0x11b;
+    return rc;
 }
