@@ -1,0 +1,1 @@
+add_executable(aes-console "aes.cpp" "aes-console.cpp")

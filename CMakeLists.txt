@@ -12,3 +12,6 @@ project(bmstu-data-protection
 
 # Enigma machine (lab 1)
 add_subdirectory(enigma)
+
+# aes encryption (lab 3)
+add_subdirectory(aes)

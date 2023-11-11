@@ -10,8 +10,8 @@ constexpr const char* output_file_name = "output";
 constexpr const char* doubled_output_file_name = "output2";
 
 //#define USE_RUS
-#define USE_ENG
-//#define USE_BIN
+//#define USE_ENG
+#define USE_BIN
 
 static void shuffle_alphabet(std::string& alphabet) {
     //static std::random_device rd;
